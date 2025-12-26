@@ -17,10 +17,8 @@ def get_p2P(repos: set[str]) -> dict[str, str]:
     result = {}
     for repo in repos:
         proc = subprocess.Popen(
-            f"echo {repo} |  ~/lookup/getValues p2P",
-            shell=True,
+            ["/bin/bash", "-c", f"echo {repo} |  ~/lookup/getValues p2P"],
             stdout=subprocess.PIPE,
-            executable="/bin/bash",
         )
         for line in proc.stdout.readlines():
             line = line.decode("utf-8", "ignore").strip()
@@ -36,10 +34,8 @@ def get_p2P(repos: set[str]) -> dict[str, str]:
 
 def get_commit(commit: str) -> Optional[dict[str, str]]:
     proc = subprocess.Popen(
-        f"echo {commit} | ~/lookup/showCnt commit",
-        shell=True,
+        ["/bin/bash", "-c", f"echo {commit} | ~/lookup/showCnt commit"],
         stdout=subprocess.PIPE,
-        executable="/bin/bash",
     )
     out = proc.stdout.read().decode("utf-8", "ignore").strip()
     if ";" in out:
@@ -61,10 +57,8 @@ def get_commit(commit: str) -> Optional[dict[str, str]]:
 
 def get_blob(blob: str) -> bytes:
     proc = subprocess.Popen(
-        f"echo {blob} | ~/lookup/showCnt blob 1",
+        ["/bin/bash", "-c", f"echo {blob} | ~/lookup/showCnt blob 1"],
         stdout=subprocess.PIPE,
-        shell=True,
-        executable="/bin/bash",
     )
 
     for line in proc.stdout.readlines():
@@ -73,10 +67,8 @@ def get_blob(blob: str) -> bytes:
 
 def get_tree(tree: str) -> list[tuple[str, str]]:
     proc = subprocess.Popen(
-        f"echo {tree} | ~/lookup/showCnt tree",
+        ["/bin/bash", "-c", f"echo {tree} | ~/lookup/showCnt tree"],
         stdout=subprocess.PIPE,
-        shell=True,
-        executable="/bin/bash",
     )
     return [
         line.decode("utf-8", "ignore").strip().split(";")[1:]
@@ -86,10 +78,8 @@ def get_tree(tree: str) -> list[tuple[str, str]]:
 
 def get_repo_head_commit(repo: str) -> list[str]:
     proc = subprocess.Popen(
-        f"echo {repo} | ~/lookup/getValues P2c",
-        shell=True,
+        ["/bin/bash", "-c", f"echo {repo} | ~/lookup/getValues P2c"],
         stdout=subprocess.PIPE,
-        executable="/bin/bash",
     )
     out = proc.stdout.read().decode("utf-8", "ignore").strip()
     if ";" in out:
@@ -116,7 +106,7 @@ def save_tarball(repo: str, files: list[str], blobs: list[str]):
 
     prev_dir = os.getcwd()
     os.chdir("../repo_woc")
-    subprocess.run(f"tar -czf {repo}.tar.gz {repo}")
+    subprocess.run(["tar", "-czf", f"{repo}.tar.gz", repo])
     shutil.rmtree("../repo_woc/" + repo)
     os.chdir(prev_dir)
 
